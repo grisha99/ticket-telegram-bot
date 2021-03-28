@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="basePath">logs</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) - %m%n" />
+        </Console>
+        <File name="FILE" fileName="${basePath}/log_srv_service.log" append="true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) - %m%n" />
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="grishchenko.telegramBot" level="debug" />
+        <Root level="info">
+            <AppenderRef ref="STDOUT" />
+            <AppenderRef ref="FILE" />
+        </Root>
+    </Loggers>
+</Configuration>

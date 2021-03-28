@@ -1,5 +1,8 @@
 package ru.grishenko.ticketing.telegram;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -16,10 +19,13 @@ import ru.grishenko.ticketing.telegram.sevices.CustomerService;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class Bot extends TelegramLongPollingBot {
 
     private static final String BOT_NAME = "TicketingHelperBot";
     private static final String TOKEN = "1712085601:AAGzuSF1JCrWC70OCALO3znbTYLkEm8u_PI";
+
+//    private final Logger logger = LoggerFactory.getLogger(Bot.class);
 
     private CustomerService customerService;
 
@@ -42,8 +48,9 @@ public class Bot extends TelegramLongPollingBot {
             setKeyBoardButton(sendMessage);
 //            setInlineKeyboard(sendMessage);
             execute(sendMessage);
+            log.info("Message sended");
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("ERROR", e);
         }
 
     }
@@ -110,22 +117,31 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
+        StringBuilder info = new StringBuilder();
         StringBuilder cust = new StringBuilder();
         if (message != null && message.hasText()) {
             switch (message.getText().trim()) {
                 case "/stopList" :
-                    cust.setLength(0);
+                    info.append("Ask StopList from: ")
+                            .append(update.getMessage().getFrom().getLastName())
+                            .append(" ")
+                            .append(update.getMessage().getFrom().getFirstName());
+
+                    log.info(info.toString());
                     cust.append("===<b>Занесены в стоп лист</b>===").append("\n");
                     cust.append("=========================").append("\n");
                     for (Customer c : customerService.getCustomerStopList()) {
                         cust.append(c.getFullNameR()).append("\n");
                     }
                     sendMsg(message, cust.toString());
-
-//                    sendMsg(message, "<i>test</i> <b>message</b>");
+ //                    sendMsg(message, "<i>test</i> <b>message</b>");
                     break;
                 case "/noClient" :
-                    cust.setLength(0);
+                    info.append("Ask NoClient list from: ")
+                            .append(update.getMessage().getFrom().getLastName())
+                            .append(" ")
+                            .append(update.getMessage().getFrom().getFirstName());
+                    log.info(info.toString());
                     cust.append("===<b>Не являются клиентами</b>===").append("\n");
                     cust.append("============================").append("\n");
                     for (Customer c : customerService.getCustomerNoOne()) {
